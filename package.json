@@ -9,5 +9,22 @@
   "main": "plugin.js",
   "scripts": {
     "test": "node tests/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MatAtBread/fast-async.git"
+  },
+  "keywords": [
+    "babel",
+    "plugin",
+    "Javascript",
+    "ES7",
+    "async",
+    "await"
+  ],
+  "author": "Mat At Bread <nodent@mailed.me.uk>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/MatAtBread/fast-async/issues"
   }
 }
