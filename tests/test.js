@@ -7,5 +7,6 @@
 var t = require("babel-core").transform(require('fs').readFileSync(__dirname+'/test-input.js'), {
   plugins: [require("../plugin.js")]
 });
+global.Promise = global.Promise || require('nodent').Thenable ;
 var f = new Function(t.code) ;
 f() ;
