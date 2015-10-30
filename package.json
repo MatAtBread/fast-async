@@ -1,6 +1,6 @@
 {
   "name": "fast-async",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "dependencies": {
     "babel-core": "5.8.33",
     "nodent": "^2.2.1"
