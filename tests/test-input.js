@@ -1,13 +1,24 @@
-async function add(a,b) {
-	async function log(x) {
-		return x ;
-	}
-	await log(a+b) ;
-	return a+b ;
-}  
-
-async function test() {
-	return await add(123,await add(234,345))==702 ;
+function pause() {
+    return new Promise(function ($return, $error) {
+        setTimeout(function () {
+            return $return(0);
+        }, 0);
+    });
 }
 
-test().then(console.log.bind(console,"return:"),console.log.bind(console,"error:")) ;
+async function doNothing() {
+    return;
+}
+
+async function test() {
+    var t = Date.now();
+    for (var j = 0; j < 500; j++) {
+        for (var i = 0; i < 500; i++) {
+            await doNothing();
+        }
+        await pause();
+    }
+    return "Finished in "+(Date.now() - t)+"ms";
+}
+
+test().then(done,done) ;

@@ -2,13 +2,13 @@
   "name": "fast-async",
   "version": "6.0.0",
   "dependencies": {
-    "babel-core": "^6.0.20",
+    "acorn-es7-plugin": "^1.0.7",
     "nodent": "^2.2.3"
   },
   "description": "fast-async/await transformer Babel plugin",
   "main": "plugin.js",
   "scripts": {
-    "test": "node tests/test.js"
+    "test": "cd tests && npm i && node ."
   },
   "repository": {
     "type": "git",

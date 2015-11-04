@@ -1,0 +1,18 @@
+{
+  "name": "fast-async-test",
+  "version": "6.0.0",
+  "dependencies": {
+    "babel-core": "^6.0.20",
+    "colors": "^1.1.2"
+  },
+  "description": "fast-async/await transformer Babel plugin - test module",
+  "main": "test.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "author": "Mat At Bread <nodent@mailed.me.uk>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/MatAtBread/fast-async/issues"
+  }
+}
