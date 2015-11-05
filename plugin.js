@@ -23,12 +23,9 @@ try {
 
 
 module.exports = function (types) {
+	debugger ;
 	var logger = console.log.bind(console) ;
-	var nodent = require('nodent')({log:logger}) ;
-	var opts = nodent.parseCompilerOptions('"use nodent-promises";',nodent.log) ;
-	opts.babelTree = true ;
-	var binder = nodent.parse("Function.prototype.$asyncbind="+Function.prototype.$asyncbind.toString().replace(/[\s]+/g," "),null,opts);
-	var asyncbind = binder.ast.body[0];	
+	var nodent = require('nodent') ;
 
 	return {
 		// Lifted from https://github.com/babel/babel/blob/master/packages/babel-plugin-syntax-async-functions/src/index.js#L3,
@@ -38,10 +35,24 @@ module.exports = function (types) {
 		},
 		visitor: {
 			Program:function Program(path,state) {
+				var envOpts = state.opts.env || {} ;
+				if (!('log' in envOpts)) envOpts.log = logger ;
+				if (!('dontInstallRequireHook' in envOpts)) envOpts.dontInstallRequireHook = true ;
+				var compiler = nodent(envOpts) ;
+
+				var opts = compiler.parseCompilerOptions('"use nodent-promises";',compiler.log) ;
+				opts.babelTree = true ;
+
+				for (var k in opts) {
+					if (state.opts && state.opts.compiler && (k in state.opts.compiler))
+						opts[k] = state.opts.compiler[k] ;
+				}
 				var pr = { origCode:state.file.code, filename:"", ast:path.node } ;
-				nodent.asynchronize(pr,undefined,opts,nodent.log) ;
+
+				var binder = compiler.parse("Function.prototype.$asyncbind="+Function.prototype.$asyncbind.toString().replace(/[\s]+/g," "),null,opts);
+				var asyncbind = binder.ast.body[0];
+				compiler.asynchronize(pr,undefined,opts,compiler.log) ;
 				pr.ast.body.unshift(asyncbind) ;
-				nodent.prettyPrint(pr,{}) ;
 			}
 		}
 	};

@@ -21,4 +21,4 @@ async function test() {
     return "Finished in "+(Date.now() - t)+"ms";
 }
 
-test().then(done,done) ;
+test().then(resolve,reject) ;
