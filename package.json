@@ -3,7 +3,7 @@
   "version": "6.0.2",
   "dependencies": {
     "acorn-es7-plugin": "^1.0.9",
-    "nodent": "^2.2.6"
+    "nodent": "^2.2.7"
   },
   "description": "fast-async/await transformer Babel plugin",
   "main": "plugin.js",
