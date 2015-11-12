@@ -1,6 +1,6 @@
 {
   "name": "fast-async",
-  "version": "6.0.2",
+  "version": "6.0.3",
   "dependencies": {
     "acorn-es7-plugin": "^1.0.9",
     "nodent": "^2.2.7"
