@@ -2,7 +2,7 @@
   "name": "fast-async-test",
   "version": "6.0.0",
   "dependencies": {
-    "babel-core": "^6.0.20",
+    "babel-core": "^6.2.1",
     "colors": "^1.1.2"
   },
   "description": "fast-async/await transformer Babel plugin - test module",

@@ -6,11 +6,10 @@
  */
 
 require('colors');
-console.log("#### To run the tests you need to \"npm install babel-core\" and optionally (if you want to compare performance):");
-console.log("####    "+"npm install babel-preset-es2015 babel-transform-async-to-module-method babel-transform-async-to-generator bluebird coroutine".yellow);
-console.log("#### These additional modules are only required for testing, not deployment.")
+var fs = require('fs') ;
 
-console.log("#### "+"As of Nov-05 2015 the babel-transform-async* plugins appear to be broken".cyan)
+console.log("#### To run the tests you need to "+"npm install babel-core".yellow+". This additional module is only required for testing, not deployment.") ;
+console.log("#### "+"As of Nov-24 2015 the transform-async-to-module-method plugin appears to not run in the test harness".cyan)
 
 console.log("\nStarting tests...");
 
@@ -50,13 +49,33 @@ var keys = Object.keys(transformers) ;
 (function nextTest(i){
 	try {
 		if (i===1) {
-			console.log("Loading babel-runtime/regenerator") ;
-			global.regeneratorRuntime = require("babel-core/node_modules/babel-runtime/regenerator").default;
+			try {
+				function walkSync(dir,match) {
+					if( dir[dir.length-1] != '/') dir=dir.concat('/')
+					var fs = fs || require('fs'),
+					files = fs.readdirSync(dir);
+					files.forEach(function(file) {
+						var stat = fs.lstatSync(dir + file) ;
+						if (!stat.isSymbolicLink()) {
+							if (file==match)
+								throw dir + file ;
+							if (stat.isDirectory())
+								walkSync(dir + file + '/',match);
+						}
+					});
+				};
+				walkSync('node_modules','regenerator') ;
+				console.log("Couldn't locate regenerator runtime") ;
+			} catch (path) {
+				console.log("Loading regenerator runtime") ;
+				global.regeneratorRuntime = require("./"+path).default;
+			}
 		}
 		console.log("Transforming with "+keys[i]);
 		var t = babel.transform(testCode, transformers[keys[i]]);
-		var f = new Function("resolve,reject",t.code) ;
-		f(function(result){
+		var f = new Function("require,resolve,reject",t.code) ;
+		f(require,
+		function(result){
 			console.log(keys[i],result.green) ;
 			next() ;
 		},function(error){
