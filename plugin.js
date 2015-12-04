@@ -6,24 +6,8 @@
  */
 
 var parserExtensionName = 'asyncFunctions';
-/* This is a VERY, VERY BAD piece of code - import the babylon parser and register the acorn-es7-plugin with it *
-debugger ;
-try {
-	var babylonParser = require.cache[Object.keys(require.cache).filter(function(x){ return x.match('babylon/lib/parser/index.js') })[0]] ;
-	var fauxAcorn = {plugins:{}} ;
-	require("acorn-es7-plugin")(fauxAcorn) ;
-	babylonParser.exports.plugins['fast-async'] = function(parser) {
-		return fauxAcorn.plugins.asyncawait(parser,{asyncExits:true,awaitAnywhere:true}) ;
-	}
-	parserExtensionName = 'fast-async'
-} catch (ex) {
-	// This is going to fail
-	debugger ;
-}*/
-
 
 module.exports = function (types) {
-	debugger ;
 	var logger = console.log.bind(console) ;
 	var nodent = require('nodent') ;
 
@@ -47,12 +31,15 @@ module.exports = function (types) {
 					if (state.opts && state.opts.compiler && (k in state.opts.compiler))
 						opts[k] = state.opts.compiler[k] ;
 				}
+
 				var pr = { origCode:state.file.code, filename:"", ast:path.node } ;
 
-				var binder = compiler.parse("Function.prototype.$asyncbind="+Function.prototype.$asyncbind.toString().replace(/[\s]+/g," "),null,opts);
-				var asyncbind = binder.ast.body[0];
 				compiler.asynchronize(pr,undefined,opts,compiler.log) ;
-				pr.ast.body.unshift(asyncbind) ;
+
+				function getRuntime(symbol,fn) {
+					return compiler.parse(symbol+"="+fn.toString().replace(/[\s]+/g," "),null,opts).ast.body[0] ;
+				}
+				pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
 			}
 		}
 	};

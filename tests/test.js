@@ -23,7 +23,7 @@ var testCode = require('fs').readFileSync(__dirname+'/test-input.js').toString()
 var babel = require("babel-core") ;
 
 var transformers = {
-	'fast-async':{plugins:[[require('../plugin.js'),{env:{dontMapStackTraces:true},compiler:{promises:false}}]]},
+	'fast-async':{plugins:[[require('../plugin.js'),{env:{dontMapStackTraces:true},compiler:{promises:true}}]]},
 };
 
 var requires ;
@@ -74,6 +74,7 @@ var keys = Object.keys(transformers) ;
 		console.log("Transforming with "+keys[i]);
 		var t = babel.transform(testCode, transformers[keys[i]]);
 		var f = new Function("require,resolve,reject",t.code) ;
+		
 		f(require,
 		function(result){
 			console.log(keys[i],result.green) ;
