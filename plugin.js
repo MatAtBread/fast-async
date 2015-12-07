@@ -33,7 +33,6 @@ module.exports = function (types) {
 				}
 
 				var pr = { origCode:state.file.code, filename:"", ast:path.node } ;
-
 				compiler.asynchronize(pr,undefined,opts,compiler.log) ;
 
 				function getRuntime(symbol,fn) {
