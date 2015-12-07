@@ -9,7 +9,6 @@ require('colors');
 var fs = require('fs') ;
 
 console.log("#### To run the tests you need to "+"npm install babel-core".yellow+". This additional module is only required for testing, not deployment.") ;
-console.log("#### "+"As of Nov-24 2015 the transform-async-to-module-method plugin appears to not run in the test harness".cyan)
 
 console.log("\nStarting tests...");
 
