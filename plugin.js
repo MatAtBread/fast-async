@@ -36,7 +36,19 @@ module.exports = function (types) {
 				compiler.asynchronize(pr,undefined,opts,compiler.log) ;
 
 				function getRuntime(symbol,fn) {
-					return compiler.parse(symbol+"="+fn.toString().replace(/[\s]+/g," "),null,opts).ast.body[0] ;
+				    var runtime = symbol+"="+fn.toString().replace(/[\s]+/g," ")+";\n" ;
+                    opts.parser.ranges = false ;
+                    opts.parser.locations = false ;
+				    var ast = compiler.parse(runtime,null,opts).ast.body[0] ;
+				    // Remove location information from the runtime as Babel >=6.5.0 does a search by 
+				    // location and barfs if multiple nodes appearantly occupy the same source locations
+				    ast = JSON.parse(JSON.stringify(ast,function replacer(key, value) {
+				        if (key==="start" || key==="end")
+				            return undefined;
+				          return value;
+				        })) ;
+				    
+					return ast ;
 				}
 				pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
 			}
