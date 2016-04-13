@@ -19,6 +19,38 @@ Install
 -------
 
 	npm install fast-async
+	
+	
+Usage
+-----
+
+Just include the plugin to the babel options. Minimal `.babelrc` example:
+
+	{
+  	  "plugins": ["fast-async"]
+	}
+
+That's all. Neither `babel-plugin-transform-runtime` nor `babel-polyfill` required.
+
+With options:
+
+	{
+		"plugins": [
+			["fast-async", {
+				"env": {
+					"augmentObject": false,
+					"dontMapStackTraces": false,
+					"asyncStackTrace": false,
+					"dontInstallRequireHook": false
+				},
+				"compiler": {
+					"promises": true,
+					"generators": false
+				}
+			}]
+		]
+	}
+
 
 Test
 ----
