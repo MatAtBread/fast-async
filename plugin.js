@@ -50,7 +50,27 @@ module.exports = function (types) {
 				    
 					return ast ;
 				}
-				pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
+
+				if (!state.opts.runtimePattern) {
+	                pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
+				} else {
+				    if (state.opts.runtimePattern==='directive') {
+	                    if (path.node.directives) {
+	                        for (var i=0; i<path.node.directives.length; i++) {
+	                            if (path.node.directives[i].value.type==="DirectiveLiteral" && path.node.directives[i].value.value==="use runtime-nodent") {
+	                                pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
+	                                path.node.directives.splice(i,1) ;
+	                                break ;
+	                            }
+	                        }
+	                    }
+				    } else {
+	                    var pattern = new RegExp(state.opts.runtimePattern) ;
+	                    if (state.file.parserOpts.filename.match(pattern)) {
+	                        pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
+	                    }
+				    }
+				}
 			}
 		}
 	};

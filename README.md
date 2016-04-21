@@ -46,7 +46,8 @@ With options:
 				"compiler": {
 					"promises": true,
 					"generators": false
-				}
+				},
+				"runtimePattern":null
 			}]
 		]
 	}
@@ -73,9 +74,26 @@ but since much of the parsing is done by Babel some are unused.
 	compiler:{
 		promises:true,    // Use nodent's "Promises" mode. Set to false if your execution environment does not support Promises.
 		generators:false  // Transform into 'Generators'.
-	}
+	},
+	runtimePattern:null   // See below
 
 For more information on the compiler options, see [ES7 and Promises](https://github.com/matatbread/nodent#es7-and-promises) in the nodent documentation.
+
+__runtimePattern__ 
+By default, fast-async will put the nodent runtime into every file it compiles. If your project is made up of more than one file, the constant
+redefinition of the runtime is a waste of time and space. You can specify that you want the runtime in particular file(s) by setting the 'runtimePattern' to a regular expression (in quotes). Only files that match the regular expression will have the runtime defined (which is global, so you only need it once). For example:
+
+	  "babel": {
+	    "plugins": [
+	      "syntax-async-functions",
+	      ["fast-async",{
+			"runtimePattern":"test-input\\.js"
+		  }]
+	    ]
+	  }
+
+Alternatively, if you set runtimePattern to `"directive"`, the statement `"use runtime-nodent";` will be replaced with the runtime during compilation.
+
 
 Useful Links
 ------------

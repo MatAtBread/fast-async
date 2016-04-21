@@ -22,7 +22,7 @@ var testCode = require('fs').readFileSync(__dirname+'/test-input.js').toString()
 var babel = require("babel-core") ;
 
 var transformers = {
-	'fast-async':{plugins:[[require('../plugin.js'),{env:{dontMapStackTraces:true},compiler:{promises:true}}]]},
+	'fast-async':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{promises:true}}]]},
 };
 
 var requires ;
