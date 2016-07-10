@@ -8,7 +8,12 @@
 require('colors');
 var fs = require('fs') ;
 
-console.log("#### To run the tests you need to "+"npm install babel-core".yellow+". This additional module is only required for testing, not deployment.") ;
+try {
+    var babel = require("babel-core") ;
+} catch (ex) {
+    console.log("#### To run the tests you need to "+"npm install babel-core".yellow+" (run 'npm i' in this directory). This additional module is only required for testing, not deployment.") ;
+    process.exit(-1) ;
+}
 
 console.log("\nStarting tests...");
 
@@ -18,8 +23,6 @@ try {
 	global.Promise = global.Promise || require('nodent').Thenable ;
 }
 var testCode = require('fs').readFileSync(__dirname+'/test-input.js').toString() ;
-
-var babel = require("babel-core") ;
 
 var transformers = {
 	'fast-async':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{promises:true}}]]},
@@ -66,8 +69,8 @@ var keys = Object.keys(transformers) ;
 				walkSync('node_modules','regenerator') ;
 				console.log("Couldn't locate regenerator runtime") ;
 			} catch (path) {
-				console.log("Loading regenerator runtime") ;
-				global.regeneratorRuntime = require("./"+path).default;
+				console.log("Loading regenerator runtime from "+path) ;
+				global.regeneratorRuntime = require("./"+path);
 			}
 		}
 		console.log("Transforming with "+keys[i]);

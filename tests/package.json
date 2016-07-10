@@ -1,9 +1,9 @@
 {
   "name": "fast-async-test",
-  "version": "6.0.12",
+  "version": "6.0.28",
   "dependencies": {
-    "babel-core": "^6.7.4",
-    "babel-plugin-syntax-async-functions": "^6.5.0",
+    "babel-core": "^6.10.4",
+    "babel-plugin-syntax-async-functions": "^6.8.0",
     "colors": "^1.1.2",
     "fast-async": "file:.."
   },
@@ -20,9 +20,12 @@
   "babel": {
     "plugins": [
       "syntax-async-functions",
-      ["fast-async",{
-		"runtimePattern":"directive"
-	  }]
+      [
+        "fast-async",
+        {
+          "runtimePattern": "directive"
+        }
+      ]
     ]
   }
 }

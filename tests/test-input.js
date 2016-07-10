@@ -1,3 +1,5 @@
+/* fast-async test file - it gets compiled by Babel using fast-async and other async-await implementations to measure performance */
+
 function pause() {
     return new Promise(function ($return, $error) {
         setTimeout(function () {
@@ -18,7 +20,7 @@ async function test() {
         }
         await pause();
     }
-    return "Finished in "+(Date.now() - t)+"ms";
+    return "Finished "+(500*500)+" async/awaits in "+(Date.now() - t)+"ms";
 }
 
 test().then(resolve,reject) ;
