@@ -17,12 +17,21 @@
   "bugs": {
     "url": "https://github.com/MatAtBread/fast-async/issues"
   },
+  "nodent":{
+      "directive":{
+          "default":{
+              "es7": true,
+              "lazyThenables": true,
+              "promises": false,
+              "generators": false
+          }
+      }
+  },
   "babel": {
     "plugins": [
       "syntax-async-functions",
       [
-        "fast-async",
-        {
+        "fast-async",{
           "runtimePattern": "directive"
         }
       ]

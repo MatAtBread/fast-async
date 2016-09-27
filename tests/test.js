@@ -25,7 +25,7 @@ try {
 var testCode = require('fs').readFileSync(__dirname+'/test-input.js').toString() ;
 
 var transformers = {
-	'fast-async':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{promises:true}}]]},
+	'fast-async':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{}}]]},
 };
 
 var requires ;

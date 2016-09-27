@@ -24,7 +24,7 @@ module.exports = function (types) {
 				if (!('dontInstallRequireHook' in envOpts)) envOpts.dontInstallRequireHook = true ;
 				var compiler = nodent(envOpts) ;
 
-				var opts = compiler.parseCompilerOptions('"use nodent-promises";',compiler.log) ;
+				var opts = compiler.parseCompilerOptions('"use nodent";',compiler.log) ;
 				opts.babelTree = true ;
 
 				for (var k in opts) {
