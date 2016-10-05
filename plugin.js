@@ -50,7 +50,13 @@ module.exports = function (babel) {
 
 					var runtime = getRuntime('Function.prototype.$asyncbind', Function.prototype.$asyncbind);
 
-					if (!state.opts.runtimePattern) {
+					if (state.opts.useModule) {
+						var moduleName = state.opts.useModule;
+						// TODO Use default moduleName ('nodent-runtime') if opts.useModule is true, wait until this module actually exists
+						// var moduleName = state.opts.useModule === true ? 'nodent-runtime' : state.opts.useModule;
+						state.addImport(moduleName, 'default');
+					}
+					else if (!state.opts.runtimePattern) {
 						path.unshiftContainer('body', runtime);
 					}
 					else if (state.opts.runtimePattern === 'directive') {
