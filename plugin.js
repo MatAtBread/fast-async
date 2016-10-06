@@ -4,15 +4,23 @@
  * 'fast-async' plugin for Babel v6.x. It uses nodent to transform the entire program before passing it off
  * to the next transformer.
  */
-module.exports = function (babel) {
+module.exports = function () {
   var logger = console.log.bind(console);
   var nodent = require('nodent');
   var parserExtensionName = 'asyncFunctions';
   var shouldIncludeRuntime = false;
 
-  function getRuntime(symbol, fn) {
-    var runtime = symbol + '=' + fn.toString();
-    return babel.transform(runtime).ast.program.body;
+  function getRuntime(symbol, fn, opts, compiler) {
+    var runtime = symbol + '=' + fn.toString().replace(/[\s]+/g, ' ') + ';\n';
+    opts.parser.ranges = false;
+    opts.parser.locations = false;
+    var ast = compiler.parse(runtime, null, opts).ast.body[0];
+    // Remove location information from the runtime as Babel >=6.5.0 does a search by
+    // location and barfs if multiple nodes appearantly occupy the same source locations
+    ast = JSON.parse(JSON.stringify(ast, function replacer(key, value) {
+      return (key === 'start' || key === 'end' ? undefined : value);
+    }));
+    return ast;
   }
 
   return {
@@ -30,9 +38,10 @@ module.exports = function (babel) {
           if (!('dontInstallRequireHook' in envOpts)) envOpts.dontInstallRequireHook = true;
 
           var compiler = nodent(envOpts);
-
           var opts = compiler.parseCompilerOptions('"use nodent-promises";', compiler.log);
           opts.babelTree = true;
+          this.opts = opts;
+          this.compiler = compiler;
 
           for (var key in opts) {
             if (state.opts && state.opts.compiler && (key in state.opts.compiler))
@@ -44,19 +53,15 @@ module.exports = function (babel) {
         },
 
         exit: function (path, state) {
-          if (!shouldIncludeRuntime) {
-            return;
-          }
+          var runtime = getRuntime('Function.prototype.$asyncbind', Function.prototype.$asyncbind, this.opts, this.compiler);
 
-          var runtime = getRuntime('Function.prototype.$asyncbind', Function.prototype.$asyncbind);
-
-          if (state.opts.useModule) {
+          if (state.opts.useModule && shouldIncludeRuntime) {
             var moduleName = state.opts.useModule;
             // TODO Use default moduleName ('nodent-runtime') if opts.useModule is true, wait until this module actually exists
             // var moduleName = state.opts.useModule === true ? 'nodent-runtime' : state.opts.useModule;
             state.addImport(moduleName, 'default');
           }
-          else if (!state.opts.runtimePattern) {
+          else if (!state.opts.runtimePattern && shouldIncludeRuntime) {
             path.unshiftContainer('body', runtime);
           }
           else if (state.opts.runtimePattern === 'directive') {
@@ -71,7 +76,7 @@ module.exports = function (babel) {
               }
             }
           }
-          else {
+          else if (shouldIncludeRuntime) {
             var pattern = new RegExp(state.opts.runtimePattern);
             if (state.file.parserOpts.filename.match(pattern)) {
               path.unshiftContainer('body', runtime);
@@ -80,12 +85,11 @@ module.exports = function (babel) {
         }
       },
 
-      FunctionExpression: function FunctionExpression(path, state) {
+      Function: function Function(path, state) {
         if (path.node.$wasAsync) {
-          shouldIncludeRuntime = true
+          shouldIncludeRuntime = true;
         }
       },
     }
   };
 };
-  
