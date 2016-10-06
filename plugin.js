@@ -57,8 +57,8 @@ module.exports = function () {
 
           if (state.opts.useModule && shouldIncludeRuntime) {
             var moduleName = state.opts.useModule;
-            // TODO Use default moduleName ('nodent-runtime') if opts.useModule is true, wait until this module actually exists
-            // var moduleName = state.opts.useModule === true ? 'nodent-runtime' : state.opts.useModule;
+            // TODO Use default moduleName ('runtime-nodent') if opts.useModule is true, wait until this module actually exists
+            // var moduleName = state.opts.useModule === true ? 'runtime-nodent' : state.opts.useModule;
             state.addImport(moduleName, 'default');
           }
           else if (!state.opts.runtimePattern && shouldIncludeRuntime) {
