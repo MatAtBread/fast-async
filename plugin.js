@@ -9,6 +9,8 @@ module.exports = function () {
   var nodent = require('nodent');
   var parserExtensionName = 'asyncFunctions';
   var shouldIncludeRuntime = false;
+  var compiler = null;
+  var compilerOpts = {};
 
   function getRuntime(symbol, fn, opts, compiler) {
     var runtime = symbol + '=' + fn.toString().replace(/[\s]+/g, ' ') + ';\n';
@@ -37,24 +39,21 @@ module.exports = function () {
           if (!('log' in envOpts)) envOpts.log = logger;
           if (!('dontInstallRequireHook' in envOpts)) envOpts.dontInstallRequireHook = true;
 
-          var compiler = nodent(envOpts);
-          var opts = compiler.parseCompilerOptions('"use nodent-promises";', compiler.log);
-          opts.babelTree = true;
+          compiler = nodent(envOpts);
+          compilerOpts = compiler.parseCompilerOptions('"use nodent-promises";', compiler.log);
+          compilerOpts.babelTree = true;
 
-          for (var key in opts) {
+          for (var key in compilerOpts) {
             if (state.opts && state.opts.compiler && (key in state.opts.compiler))
-              opts[key] = state.opts.compiler[key];
+              compilerOpts[key] = state.opts.compiler[key];
           }
 
-          this.compilerOpts = opts;
-          this.compiler = compiler;
-
           var pr = { origCode: state.file.code, filename: '', ast: path.node };
-          compiler.asynchronize(pr, undefined, opts, compiler.log);
+          compiler.asynchronize(pr, undefined, compilerOpts, compiler.log);
         },
 
         exit: function (path, state) {
-          var runtime = getRuntime('Function.prototype.$asyncbind', Function.prototype.$asyncbind, this.compilerOpts, this.compiler);
+          var runtime = getRuntime('Function.prototype.$asyncbind', Function.prototype.$asyncbind, compilerOpts, compiler);
 
           if (state.opts.useModule && shouldIncludeRuntime) {
             var moduleName = state.opts.useModule;
