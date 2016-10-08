@@ -1,13 +1,13 @@
 {
   "name": "fast-async",
-  "version": "6.0.33",
+  "version": "6.0.34",
   "dependencies": {
     "nodent": ">=2.6.9"
   },
   "description": "fast-async/await transformer Babel plugin",
   "main": "plugin.js",
   "scripts": {
-    "test": "cd tests && npm i && node ."
+    "test": "cd tests && npm i && node --expose-gc ."
   },
   "repository": {
     "type": "git",

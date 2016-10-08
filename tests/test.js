@@ -15,7 +15,14 @@ try {
     process.exit(-1) ;
 }
 
-console.log("\nStarting tests...");
+try {
+    global.gc() ;
+} catch (ex) {
+    console.log("You get more accurate timings by running with the node option --expose-gc") ;
+    global.gc = function(){} ;
+}
+
+console.log("\nNB:The timings here are only indicative. GC and poor sampling generate variable results. More detailed performance tests can be found in "+"nodent".cyan+"\nStarting tests...");
 
 try {
 	global.Promise = global.Promise || require('bluebird') ;
@@ -25,7 +32,8 @@ try {
 var testCode = require('fs').readFileSync(__dirname+'/test-input.js').toString() ;
 
 var transformers = {
-	'fast-async':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{}}]]},
+  'fast-async (es7-lazy)':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{promises:false,es7:true,lazyThenables:true}}]]},
+  'fast-async (promises)':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{promises:true}}]]}
 };
 
 var requires ;
@@ -47,36 +55,41 @@ try {
 	console.log("'"+("npm install "+requires.join(' ')).yellow+"' to compare against babel plugin 'transform-async-to-module-method'") ;
 }
 
+function loadRegenerator(){
+  try {
+    function walkSync(dir,match) {
+      if( dir[dir.length-1] != '/') dir=dir.concat('/')
+      var fs = fs || require('fs'),
+      files = fs.readdirSync(dir);
+      files.forEach(function(file) {
+        var stat = fs.lstatSync(dir + file) ;
+        if (!stat.isSymbolicLink()) {
+          if (file==match)
+            throw dir + file ;
+          if (stat.isDirectory())
+            walkSync(dir + file + '/',match);
+        }
+      });
+    };
+    walkSync('node_modules','regenerator') ;
+    console.log("Couldn't locate regenerator runtime") ;
+  } catch (path) {
+    global.regeneratorRuntime = require("./"+path);
+    console.log("Loaded regenerator runtime from "+path+" ",regeneratorRuntime.toString().yellow) ;
+  }
+}
+
 var keys = Object.keys(transformers) ;
 (function nextTest(i){
 	try {
-		if (i===1) {
-			try {
-				function walkSync(dir,match) {
-					if( dir[dir.length-1] != '/') dir=dir.concat('/')
-					var fs = fs || require('fs'),
-					files = fs.readdirSync(dir);
-					files.forEach(function(file) {
-						var stat = fs.lstatSync(dir + file) ;
-						if (!stat.isSymbolicLink()) {
-							if (file==match)
-								throw dir + file ;
-							if (stat.isDirectory())
-								walkSync(dir + file + '/',match);
-						}
-					});
-				};
-				walkSync('node_modules','regenerator') ;
-				console.log("Couldn't locate regenerator runtime") ;
-			} catch (path) {
-				console.log("Loading regenerator runtime from "+path) ;
-				global.regeneratorRuntime = require("./"+path);
-			}
-		}
+		if (i===2)
+            loadRegenerator() ;
+
 		console.log("Transforming with "+keys[i]);
 		var t = babel.transform(testCode, transformers[keys[i]]);
 		var f = new Function("require,resolve,reject",t.code) ;
-		
+
+        global.gc() ;
 		f(require,
 		function(result){
 			console.log(keys[i],result.green) ;
