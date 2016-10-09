@@ -24,17 +24,19 @@ try {
 
 console.log("\nNB:The timings here are only indicative. GC and poor sampling generate variable results. More detailed performance tests can be found in "+"nodent".cyan+"\nStarting tests...");
 
-try {
-	global.Promise = global.Promise || require('bluebird') ;
-} catch (ex) {
-	global.Promise = global.Promise || require('nodent').Thenable ;
-}
+var nodent = require('nodent') ;
+global.Promise = global.Promise || nodent.EagerThenable() ;
+
 var testCode = require('fs').readFileSync(__dirname+'/test-input.js').toString() ;
 
+var eagerName = 'fast-async (nodent-'+nodent.EagerThenable().name+')' ; 
 var transformers = {
-  'fast-async (es7-lazy)':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{promises:false,es7:true,lazyThenables:true}}]]},
-  'fast-async (promises)':{plugins:[[require('../plugin.js'),{runtimePatten:'directive',env:{dontMapStackTraces:true},compiler:{promises:true}}]]}
+  'fast-async (es7-lazy)':  {plugins:[[require('../plugin.js'),{runtimePatten:'directive',compiler:{promises:false,es7:true,lazyThenables:true}}]]},
 };
+transformers[eagerName] = {plugins:[[require('../plugin.js'),{runtimePatten:'directive',compiler:{promises:false,es7:true,lazyThenables:false}}]]} ;
+
+
+var needRegenerator = Object.keys(transformers).length ;
 
 var requires ;
 try {
@@ -82,7 +84,7 @@ function loadRegenerator(){
 var keys = Object.keys(transformers) ;
 (function nextTest(i){
 	try {
-		if (i===2)
+		if (i===needRegenerator)
             loadRegenerator() ;
 
 		console.log("Transforming with "+keys[i]);

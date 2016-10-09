@@ -1,77 +1,114 @@
-"use strict";
+'use strict';
 
 /*
  * 'fast-async' plugin for Babel v6.x. It uses nodent to transform the entire program before passing it off
  * to the next transformer.
  */
+module.exports = function () {
+    var logger = console.log.bind(console);
+    var nodent = require('nodent');
+    var compiler = null;
+    var compilerOpts = {};
+    var shouldIncludeRuntime = false;
+    var defaultEnv = {
+        log:logger,
+        dontInstallRequireHook:true,
+        dontMapStackTraces:true,
+        extension:null
+    };
+    
+    function getRuntime(symbol, fn, opts, compiler) {
+        var runtime = symbol + '=' + fn.toString().replace(/[\s]+/g, ' ') + ';\n';
+        opts.parser.ranges = false;
+        opts.parser.locations = false;
+        var ast = compiler.parse(runtime, null, opts).ast.body[0];
+        // Remove location information from the runtime as Babel >=6.5.0 does a search by
+        // location and barfs if multiple nodes apparently occupy the same source locations
+        ast = JSON.parse(JSON.stringify(ast, function replacer(key, value) {
+            return (key === 'start' || key === 'end' ? undefined : value);
+        }));
+        return ast;
+    }
 
-var parserExtensionName = 'asyncFunctions';
+    return {
+        // Lifted from https://github.com/babel/babel/blob/master/packages/babel-plugin-syntax-async-functions/src/index.js#L3,
+        // which is not nice, but avoids installation complexity with plugins (which I must try to work out sometime)
+        manipulateOptions: function manipulateOptions(opts, parserOpts) {
+            parserOpts.plugins.push('asyncFunctions');
+        },
 
-module.exports = function (types) {
-	var logger = console.log.bind(console) ;
-	var nodent = require('nodent') ;
+        visitor: {
+            Program: {
+                enter: function(path, state){
+                    shouldIncludeRuntime = false;
+                },
+                exit: function (path, state) {
+                    // Check if there was an async or await keyword before bothering to process the AST
+                    if (!shouldIncludeRuntime)
+                        return ;
+                    
+                    var envOpts = state.opts.env || {};
+                    Object.keys(defaultEnv).forEach(function(k){
+                        if (!(k in envOpts))
+                            envOpts[k] = defaultEnv[k] ;
+                    }) ;
+                    
+                    compiler = nodent(envOpts);
+                    compilerOpts = compiler.parseCompilerOptions('"use nodent-promises";', compiler.log);
 
-	return {
-		// Lifted from https://github.com/babel/babel/blob/master/packages/babel-plugin-syntax-async-functions/src/index.js#L3,
-		// which is not nice, but avoids installation complexity with plugins (which I must try to work out sometime)
-		manipulateOptions: function manipulateOptions(opts, parserOpts) {
-			parserOpts.plugins.push(parserExtensionName);
-		},
-		visitor: {
-			Program:function Program(path,state) {
-				var envOpts = state.opts.env || {} ;
-				if (!('log' in envOpts)) envOpts.log = logger ;
-				if (!('dontInstallRequireHook' in envOpts)) envOpts.dontInstallRequireHook = true ;
-				var compiler = nodent(envOpts) ;
+                    Object.keys(state.opts.compiler).forEach(function(k){
+                        compilerOpts[k] = state.opts.compiler[k] ;
+                    }) ;
+                    compilerOpts.babelTree = true;
 
-				var opts = compiler.parseCompilerOptions('"use nodent";',compiler.log) ;
-				opts.babelTree = true ;
+                    var pr = { origCode: state.file.code, filename: '', ast: path.node };
+                    compiler.asynchronize(pr, undefined, compilerOpts, compiler.log);
 
-				for (var k in opts) {
-					if (state.opts && state.opts.compiler && (k in state.opts.compiler))
-						opts[k] = state.opts.compiler[k] ;
-				}
+                    var runtime ;
+                    if (!compilerOpts.noRuntime) {
+                        if (compilerOpts.generators) {
+                            runtime = getRuntime('Function.prototype.$asyncspawn', Function.prototype.$asyncspawn, compilerOpts, compiler);
+                        } else {
+                            runtime = getRuntime('Function.prototype.$asyncbind', Function.prototype.$asyncbind, compilerOpts, compiler);
+                        }
 
-				var pr = { origCode:state.file.code, filename:"", ast:path.node } ;
-				compiler.asynchronize(pr,undefined,opts,compiler.log) ;
+                        if (state.opts.useRuntimeModule) {
+                            state.addImport(state.opts.useRuntimeModule === true ? 'nodent-runtime' : state.opts.useRuntimeModule, 'default');
+                        }
+                        else if (!state.opts.runtimePattern) {
+                            path.unshiftContainer('body', runtime);
+                        }
+                        else if (state.opts.runtimePattern === 'directive') {
+                            var hasRuntime = false;
+                            for (var index = 0; index < path.node.directives.length; index++) {
+                                if (path.node.directives[index].value.value === 'use runtime-nodent') {
+                                    if (!hasRuntime) {
+                                        path.unshiftContainer('body', runtime);
+                                        hasRuntime = true;
+                                    }
+                                    path.node.directives.splice(index, 1);
+                                }
+                            }
+                        }
+                        else {
+                            var pattern = new RegExp(state.opts.runtimePattern);
+                            if (state.file.parserOpts.filename.match(pattern)) {
+                                path.unshiftContainer('body', runtime);
+                            }
+                        }
+                    }
+                }
+            },
 
-				function getRuntime(symbol,fn) {
-				    var runtime = symbol+"="+fn.toString().replace(/[\s]+/g," ")+";\n" ;
-                    opts.parser.ranges = false ;
-                    opts.parser.locations = false ;
-				    var ast = compiler.parse(runtime,null,opts).ast.body[0] ;
-				    // Remove location information from the runtime as Babel >=6.5.0 does a search by 
-				    // location and barfs if multiple nodes appearantly occupy the same source locations
-				    ast = JSON.parse(JSON.stringify(ast,function replacer(key, value) {
-				        if (key==="start" || key==="end")
-				            return undefined;
-				          return value;
-				        })) ;
-				    
-					return ast ;
-				}
+            AwaitExpression: function Function(path, state) {
+                shouldIncludeRuntime = true;
+            },
 
-				if (!state.opts.runtimePattern) {
-	                pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
-				} else {
-				    if (state.opts.runtimePattern==='directive') {
-	                    if (path.node.directives) {
-	                        for (var i=0; i<path.node.directives.length; i++) {
-	                            if (path.node.directives[i].value.type==="DirectiveLiteral" && path.node.directives[i].value.value==="use runtime-nodent") {
-	                                pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
-	                                path.node.directives.splice(i,1) ;
-	                                break ;
-	                            }
-	                        }
-	                    }
-				    } else {
-	                    var pattern = new RegExp(state.opts.runtimePattern) ;
-	                    if (state.file.parserOpts.filename.match(pattern)) {
-	                        pr.ast.body.unshift(getRuntime('Function.prototype.$asyncbind',Function.prototype.$asyncbind)) ;
-	                    }
-				    }
-				}
-			}
-		}
-	};
+            Function: function Function(path, state) {
+                if (path.node.async) {
+                    shouldIncludeRuntime = true;
+                }
+            }
+        }
+    };
 };

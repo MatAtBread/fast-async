@@ -2,7 +2,7 @@ fast-async
 ==========
 
 'fast-async' is a _Babel v6.x.x_ plugin that implements the ES7 keywords `async` and `await` using syntax transformation
-at compile-time rather than generators.
+at compile-time, rather than generators.
 
 The main reason for using 'fast-async' as opposed to Babel's default implementation of async/await is
 performance (https://github.com/MatAtBread/nodent#performance) - it's 3-4 times faster in a browser/node, and
@@ -14,6 +14,9 @@ test coverage is included with nodent.
 Because Babel parses the code, the ES7 extensions possible with nodent (`await` anywhere, `async return` and `async throw`) are not supported, however full implementation of `async function` containing `await` expressions is implemented.
 
 For _Babel v5.x.x_ install fast-async@1.0.3
+
+> v6.1.x
+fast-async@>=6.1.0 can use nodent v2 or v3 (and acorn v3 or v3). Nodent v3 has the option of generating code with Promises which needs no runtime at all, at the cost of size and speed. v6.1.x can also refernce the runtme via an import (useRuntimeModule option), rather than include the source inline.
 
 Install
 -------
@@ -39,15 +42,15 @@ With options:
 			["fast-async", {
 				"env": {
 					"augmentObject": false,
-					"dontMapStackTraces": false,
-					"asyncStackTrace": false,
-					"dontInstallRequireHook": false
+					"dontMapStackTraces": true,
+					"dontInstallRequireHook": true
 				},
 				"compiler": {
 					"promises": true,
 					"generators": false
 				},
-				"runtimePattern":null
+				"runtimePattern":null,
+				"useRuntimeModule":false
 			}]
 		]
 	}
@@ -67,7 +70,7 @@ but since much of the parsing is done by Babel some are unused.
 	env:{
 		log:function(string),        // Supplied routine to emit transformation warnings. Default: console.log
 		augmentObject:false,         // Add the nodent utilities asyncify() and isThenable() to Object.prototype
-		dontMapStackTraces:false,    // Don't install the stack trace hook that maps line numbers
+		dontMapStackTraces:true,     // Don't install the stack trace hook that maps line numbers
 		asyncStackTrace:false,       // Provide async stack traces
 		dontInstallRequireHook:false // Don't transform all JS files as they are loaded into node
 	},
@@ -75,13 +78,21 @@ but since much of the parsing is done by Babel some are unused.
 		promises:true,    // Use nodent's "Promises" mode. Set to false if your execution environment does not support Promises.
 		generators:false  // Transform into 'Generators'.
 	},
-	runtimePattern:null   // See below
+	runtimePattern:null,   	// See below
+	useRuntimeModule:false	// See below
 
 For more information on the compiler options, see [ES7 and Promises](https://github.com/matatbread/nodent#es7-and-promises) in the nodent documentation.
 
+> 6.1.x
+The dontMapStackTraces now defaults to `true` as having both nodent and babel map stack traces doesn't work well
+
 __runtimePattern__ 
-By default, fast-async will put the nodent runtime into every file it compiles. If your project is made up of more than one file, the constant
-redefinition of the runtime is a waste of time and space. You can specify that you want the runtime in particular file(s) by setting the 'runtimePattern' to a regular expression (in quotes). Only files that match the regular expression will have the runtime defined (which is global, so you only need it once). For example:
+By default, fast-async will put the nodent runtime into every file containing an `async` function or `await` expression. 
+If your project is made up of more than one file, the constant redefinition of the runtime is a waste of time and space. You can 
+specify that you want the runtime in particular file(s) by setting the 'runtimePattern' to a regular expression (in quotes). 
+Only files that match the regular expression will have the runtime defined (which is global, so you only need it once). 
+
+For example:
 
 	  "babel": {
 	    "plugins": [
@@ -94,6 +105,8 @@ redefinition of the runtime is a waste of time and space. You can specify that y
 
 Alternatively, if you set runtimePattern to `"directive"`, the statement `"use runtime-nodent";` will be replaced with the runtime during compilation.
 
+> v6.1.x
+If you specify the option `"useRuntimeModule":true`, the runtime is not included directly as source, but via an import of [nodent-runtime](https://github.com/MatAtBread/nodent-runtime), which is typically resolved to `require()` by babel. The nodent-runtime module must be added as a dependency in your target project. The runtime need only be included once in your entire project, and should precede any code that uses async or await.
 
 Useful Links
 ------------
