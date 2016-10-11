@@ -1,6 +1,6 @@
 {
   "name": "fast-async",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "dependencies": {
     "nodent": ">=2.6.12"
   },

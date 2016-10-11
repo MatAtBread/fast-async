@@ -47,6 +47,7 @@ module.exports = function () {
                     if (!shouldIncludeRuntime)
                         return ;
                     
+                    state.opts = state.opts || {} ;
                     var envOpts = state.opts.env || {};
                     Object.keys(defaultEnv).forEach(function(k){
                         if (!(k in envOpts))
@@ -56,9 +57,11 @@ module.exports = function () {
                     compiler = nodent(envOpts);
                     compilerOpts = compiler.parseCompilerOptions('"use nodent-promises";', compiler.log);
 
-                    Object.keys(state.opts.compiler).forEach(function(k){
-                        compilerOpts[k] = state.opts.compiler[k] ;
-                    }) ;
+                    if (state.opts.compiler && typeof state.opts.compiler==="object") {
+                        Object.keys(state.opts.compiler).forEach(function(k){
+                            compilerOpts[k] = state.opts.compiler[k] ;
+                        }) ;
+                    }
                     compilerOpts.babelTree = true;
 
                     var pr = { origCode: state.file.code, filename: '', ast: path.node };
