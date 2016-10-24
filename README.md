@@ -16,7 +16,7 @@ Because Babel parses the code, the ES7 extensions possible with nodent (`await` 
 For _Babel v5.x.x_ install fast-async@1.0.3
 
 > v6.1.x
-fast-async@>=6.1.0 can use nodent v2 or v3 (and acorn v3 or v3). Nodent v3 has the option of generating code with Promises which needs no runtime at all, at the cost of size and speed. v6.1.x can also refernce the runtme via an import (useRuntimeModule option), rather than include the source inline.
+fast-async@>=6.1.0 can use nodent v2 or v3 (and acorn v3 or v3). Nodent v3 has the option of generating code with Promises which needs no runtime at all, at the cost of size and speed. v6.1.x can also reference the runtime via an import (useRuntimeModule option), rather than include the source inline.
 
 Install
 -------
