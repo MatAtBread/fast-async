@@ -20,66 +20,69 @@ fast-async@>=6.1.0 can use nodent v2 or v3 (and acorn v3 or v3). Nodent v3 has t
 
 Install
 -------
-
-	npm install fast-async
-	
-	
+```bash
+npm install fast-async --save
+```
+  
 Usage
 -----
 
 Just include the plugin to the babel options. Minimal `.babelrc` example:
-
-	{
-  	  "plugins": ["fast-async"]
-	}
+```js
+{
+  "plugins": ["fast-async"]
+}
+```
 
 That's all. Neither `babel-plugin-transform-runtime` nor `babel-polyfill` required.
 
 With options:
-
-	{
-		"plugins": [
-			["fast-async", {
-				"env": {
-					"augmentObject": false,
-					"dontMapStackTraces": true,
-					"dontInstallRequireHook": true
-				},
-				"compiler": {
-					"promises": true,
-					"generators": false
-				},
-				"runtimePattern":null,
-				"useRuntimeModule":false
-			}]
-		]
-	}
-
+```js
+{
+  "plugins": [
+    ["fast-async", {
+      "env": {
+        "augmentObject": false,
+        "dontMapStackTraces": true,
+        "dontInstallRequireHook": true
+      },
+      "compiler": {
+        "promises": true,
+        "generators": false
+      },
+      "runtimePattern":null,
+      "useRuntimeModule":false
+    }]
+  ]
+}
+```
 
 Test
 ----
 From the installation directory (e.g. node_modules/fast-async):
-
-	npm test
-
+```bash
+npm test
+```
 Options
 -------
 The plugin accepts the following options object, which itself is optional, as are all members. These are based on the options in nodent,
 but since much of the parsing is done by Babel some are unused.
 
-	env:{
-		log:function(string),        // Supplied routine to emit transformation warnings. Default: console.log
-		augmentObject:false,         // Add the nodent utilities asyncify() and isThenable() to Object.prototype
-		dontMapStackTraces:true,     // Don't install the stack trace hook that maps line numbers
-		asyncStackTrace:false,       // Provide async stack traces
-		dontInstallRequireHook:false // Don't transform all JS files as they are loaded into node
-	},
-	compiler:{
-		promises:true,    // Use nodent's "Promises" mode. Set to false if your execution environment does not support Promises.
-		generators:false  // Transform into 'Generators'.
-	},
-	runtimePattern:null,   	// See below
-	useRuntimeModule:false	// See below
+```js
+env:{
+  log:function(string),        // Supplied routine to emit transformation warnings. Default: console.log
+  augmentObject:false,         // Add the nodent utilities asyncify() and isThenable() to Object.prototype
+  dontMapStackTraces:true,     // Don't install the stack trace hook that maps line numbers
+  asyncStackTrace:false,       // Provide async stack traces
+  dontInstallRequireHook:false // Don't transform all JS files as they are loaded into node
+},
+compiler:{
+  promises:true,    // Use nodent's "Promises" mode. Set to false if your execution environment does not support Promises.
+  generators:false  // Transform into 'Generators'.
+},
+runtimePattern:null,     // See below
+useRuntimeModule:false  // See below
+```
 
 For more information on the compiler options, see [ES7 and Promises](https://github.com/matatbread/nodent#es7-and-promises) in the nodent documentation.
 
@@ -94,15 +97,16 @@ Only files that match the regular expression will have the runtime defined (whic
 
 For example:
 
-	  "babel": {
-	    "plugins": [
-	      "syntax-async-functions",
-	      ["fast-async",{
-			"runtimePattern":"test-input\\.js"
-		  }]
-	    ]
-	  }
-
+```js
+"babel": {
+  "plugins": [
+    "syntax-async-functions",
+    ["fast-async",{
+       "runtimePattern":"test-input\\.js"
+    }]
+  ]
+}
+```
 Alternatively, if you set runtimePattern to `"directive"`, the statement `"use runtime-nodent";` will be replaced with the runtime during compilation.
 
 > v6.1.x
