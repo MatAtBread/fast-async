@@ -95,7 +95,11 @@ module.exports = function () {
                         }
                         else {
                             var pattern = new RegExp(state.opts.runtimePattern);
-                            if (state.file.parserOpts.filename.match(pattern)) {
+                            var parserOpts = state.file.parserOpts;
+                            
+                            // The key is called sourceFileName since babel-core 6.16:
+                            var sourceFileName = parserOpts.filename || parserOpts.sourceFileName;
+                            if (sourceFileName.match(pattern)) {
                                 path.unshiftContainer('body', runtime);
                             }
                         }
