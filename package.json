@@ -7,7 +7,7 @@
   "description": "fast-async/await transformer Babel plugin",
   "main": "plugin.js",
   "scripts": {
-    "test": "cd tests && npm i && node --expose-gc ."
+    "test": "cd tests && npm i && npm test"
   },
   "repository": {
     "type": "git",

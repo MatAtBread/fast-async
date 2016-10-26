@@ -1,19 +1,31 @@
 {
-    "name": "fast-async-test",
-    "version": "6.0.30",
-    "dependencies": {
-        "babel-core": "^6.10.4",
-        "babel-plugin-syntax-async-functions": "^6.8.0",
-        "colors": "^1.1.2"
-    },
-    "description": "fast-async/await transformer Babel plugin - test module",
-    "main": "test.js",
-    "scripts": {
-        "test": "node ."
-    },
-    "author": "Mat At Bread <nodent@mailed.me.uk>",
-    "license": "BSD-2-Clause",
-    "bugs": {
-        "url": "https://github.com/MatAtBread/fast-async/issues"
-    }
+  "name": "fast-async-test",
+  "version": "6.1.2",
+  "dependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.10.4",
+    "babel-plugin-syntax-async-functions": "^6.8.0",
+    "colors": "^1.1.2"
+  },
+  "description": "fast-async/await transformer Babel plugin - test module",
+  "main": "test.js",
+  "scripts": {
+    "test": "node_modules/babel-cli/bin/babel.js test-input.js && node --expose-gc ."
+  },
+  "author": "Mat At Bread <nodent@mailed.me.uk>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/MatAtBread/fast-async/issues"
+  },
+  "babel": {
+    "plugins": [
+      [
+        "..",
+        {
+          "runtimePattern": "test-input\\.js",
+          "useRuntimeModule": true
+        }
+      ]
+    ]
+  }
 }

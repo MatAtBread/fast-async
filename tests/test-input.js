@@ -24,3 +24,5 @@ async function test() {
 }
 
 test().then(resolve,reject) ;
+
+/* If you see this, then test-input.js was compiled by babel-cli. Things to check are that there's an import at the top for nodent-runtime, and lots of symbols starting with $ */

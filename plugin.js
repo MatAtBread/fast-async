@@ -4,7 +4,7 @@
  * 'fast-async' plugin for Babel v6.x. It uses nodent to transform the entire program before passing it off
  * to the next transformer.
  */
-module.exports = function () {
+module.exports = function (babel) {
     var logger = console.log.bind(console);
     var nodent = require('nodent');
     var compiler = null;
@@ -21,7 +21,8 @@ module.exports = function () {
         var runtime = symbol + '=' + fn.toString().replace(/[\s]+/g, ' ') + ';\n';
         opts.parser.ranges = false;
         opts.parser.locations = false;
-        var ast = compiler.parse(runtime, null, opts).ast.body[0];
+        // Use babel rather than nodent (acorn) as babel's AST is not ESTree compliant
+        var ast = babel.transform(runtime).ast.program.body[0];
         // Remove location information from the runtime as Babel >=6.5.0 does a search by
         // location and barfs if multiple nodes apparently occupy the same source locations
         ast = JSON.parse(JSON.stringify(ast, function replacer(key, value) {
