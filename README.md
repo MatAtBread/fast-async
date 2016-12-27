@@ -57,6 +57,19 @@ With options:
 }
 ```
 
+The option `spec` sets the compiler up to produce the most spec-compatible output (at the expense of some performance) by using the `wrapAwait`, `noRuntime` and `promises` options. Since `noRuntime` is specified, no runtime options are required.
+
+```js
+{
+  "plugins": [
+    ["fast-async", {
+      "spec":true
+    }]
+  ]
+}
+```
+
+
 Test
 ----
 From the installation directory (e.g. node_modules/fast-async):

@@ -22,8 +22,7 @@
       [
         "..",
         {
-          "runtimePattern": "test-input\\.js",
-          "useRuntimeModule": true
+          "spec":true
         }
       ]
     ]

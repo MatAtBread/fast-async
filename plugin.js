@@ -58,9 +58,18 @@ module.exports = function (babel) {
                     compiler = nodent(envOpts);
                     compilerOpts = compiler.parseCompilerOptions('"use nodent-promises";', compiler.log);
 
-                    if (state.opts.compiler && typeof state.opts.compiler==="object") {
-                        Object.keys(state.opts.compiler).forEach(function(k){
-                            compilerOpts[k] = state.opts.compiler[k] ;
+                    var defCompilerOpts = state.opts.compiler ;
+                    if (state.opts.spec) {
+                        defCompilerOpts = {
+                            promises:true,
+                            wrapAwait:true,
+                            noRuntime:true
+                        }                        
+                    }
+
+                    if (defCompilerOpts && typeof defCompilerOpts==="object") {
+                        Object.keys(defCompilerOpts).forEach(function(k){
+                            compilerOpts[k] = defCompilerOpts[k] ;
                         }) ;
                     }
                     compilerOpts.babelTree = true;
