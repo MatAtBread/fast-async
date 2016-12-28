@@ -1,8 +1,8 @@
 {
   "name": "fast-async",
-  "version": "6.1.3",
+  "version": "6.2.0",
   "dependencies": {
-    "nodent": ">=2.6.12"
+    "nodent": ">=3.0.8"
   },
   "description": "fast-async/await transformer Babel plugin",
   "main": "plugin.js",
