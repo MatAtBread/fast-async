@@ -25,13 +25,16 @@ try {
 console.log("\nNB:The timings here are only indicative. GC and poor sampling generate variable results. More detailed performance tests can be found in "+"nodent".cyan+"\nStarting tests...");
 
 var nodent = require('nodent') ;
-global.Promise = global.Promise || nodent.EagerThenable() ;
+var systemPromise = global.Promise || nodent.EagerThenable() ;
+
+global.Promise = nodent.EagerThenable() ;
 
 var testCode = require('fs').readFileSync(__dirname+'/test-input.js').toString() ;
 
 var eagerName = 'fast-async (nodent-'+nodent.EagerThenable().name+')' ; 
 var transformers = {
-  'fast-async (es7-lazy)':  {plugins:[[require('../plugin.js'),{runtimePatten:'directive',compiler:{promises:false,es7:true,lazyThenables:true}}]]},
+    'fast-async (es7-lazy)':  {plugins:[[require('../plugin.js'),{runtimePatten:'directive',compiler:{promises:false,es7:true,lazyThenables:true}}]]},
+    'fast-async (spec:true)':  {plugins:[[require('../plugin.js'),{runtimePatten:null,compiler:{promises:true,es7:true,noRuntime:true,wrapAwait:true}}]]},
 };
 transformers[eagerName] = {plugins:[[require('../plugin.js'),{runtimePatten:'directive',compiler:{promises:false,es7:true,lazyThenables:false}}]]} ;
 
@@ -78,6 +81,7 @@ function loadRegenerator(){
   } catch (path) {
     global.regeneratorRuntime = require("./"+path);
     console.log("Loaded regenerator runtime from "+path+" ",regeneratorRuntime.toString().yellow) ;
+    global.Promise = systemPromise ;
   }
 }
 
