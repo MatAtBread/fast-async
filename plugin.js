@@ -73,6 +73,7 @@ module.exports = function (babel) {
                         }) ;
                     }
                     compilerOpts.babelTree = true;
+                    compilerOpts.parser.noNodentExtensions = true ;
 
                     var pr = { origCode: state.file.code, filename: '', ast: path.node };
                     compiler.asynchronize(pr, undefined, compilerOpts, compiler.log);
