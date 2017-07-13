@@ -1,11 +1,12 @@
 {
   "name": "fast-async-test",
-  "version": "6.1.2",
+  "version": "6.3.0",
   "dependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-core": "^6.10.4",
-    "babel-plugin-syntax-async-functions": "^6.8.0",
-    "colors": "^1.1.2"
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "colors": "^1.1.2",
+    "nodent": "^3.1.0"
   },
   "description": "fast-async/await transformer Babel plugin - test module",
   "main": "test.js",
@@ -22,7 +23,7 @@
       [
         "..",
         {
-          "spec":true
+          "spec": true
         }
       ]
     ]
