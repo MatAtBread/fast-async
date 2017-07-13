@@ -42,9 +42,7 @@ With options:
   "plugins": [
     ["fast-async", {
       "env": {
-        "augmentObject": false,
-        "dontMapStackTraces": true,
-        "dontInstallRequireHook": true
+      	"log":false
       },
       "compiler": {
         "promises": true,
@@ -89,12 +87,12 @@ env:{
   dontInstallRequireHook:false // Don't transform all JS files as they are loaded into node (default: true)
 },
 compiler:{
-  promises:true,    // Use nodent's "Promises" mode. Set to false if your execution environment does not support Promises.
-  generators:false  // Transform into 'Generators' (sub-optimal, but it works)
+  promises:true    // Use nodent's "Promises" mode. Set to false if your runtime environment does not support Promises (default: true)
 },
 runtimePattern:null,     // See below
 useRuntimeModule:false  // See below
 ```
+_NB_: As of v6.3.x, the `env` options `augmentObject`,`dontMapStackTraces` and `dontInstallRequireHook:false` are no longer impemented or required. These modified the execution environment of the compiler (as opposed to the runtime environment of the code generated) and consequently had no purpose.
 
 For more information on the compiler options, see [ES7 and Promises](https://github.com/matatbread/nodent#es7-and-promises) in the nodent documentation.
 
