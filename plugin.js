@@ -6,15 +6,12 @@
  */
 module.exports = function (babel) {
     var logger = console.log.bind(console);
-    var nodent = require('nodent');
+    var NodentCompiler = require('nodent-compiler');
     var compiler = null;
     var compilerOpts = {};
-    var shouldIncludeRuntime = false;
+    var requiresTranspilation = false;
     var defaultEnv = {
-        log:logger,
-        dontInstallRequireHook:true,
-        dontMapStackTraces:true,
-        extension:null
+        log:logger
     };
     
     function getRuntime(symbol, fn, opts, compiler) {
@@ -41,11 +38,11 @@ module.exports = function (babel) {
         visitor: {
             Program: {
                 enter: function(path, state){
-                    shouldIncludeRuntime = false;
+                    requiresTranspilation = false;
                 },
                 exit: function (path, state) {
                     // Check if there was an async or await keyword before bothering to process the AST
-                    if (!shouldIncludeRuntime)
+                    if (!requiresTranspilation)
                         return ;
                     
                     state.opts = state.opts || {} ;
@@ -55,16 +52,22 @@ module.exports = function (babel) {
                             envOpts[k] = defaultEnv[k] ;
                     }) ;
                     
-                    compiler = nodent(envOpts);
-                    compilerOpts = compiler.parseCompilerOptions('"use nodent-promises";', compiler.log);
+                    compiler = new NodentCompiler(envOpts);
+                    
+                    /* Compiler options */
+                    compilerOpts = {} ;
+                    Object.keys(NodentCompiler.initialCodeGenOpts).forEach(function(k){
+                        compilerOpts[k] = NodentCompiler.initialCodeGenOpts[k] ;
+                    }) ;
+                    compilerOpts.promises = true ;
+                    compilerOpts.babelTree = true;
+                    compilerOpts.parser = { noNodentExtensions: true} ;
 
-                    var defCompilerOpts = state.opts.compiler ;
+                    var defCompilerOpts = state.opts.compiler || {} ;
                     if (state.opts.spec) {
-                        defCompilerOpts = {
-                            promises:true,
-                            wrapAwait:true,
-                            noRuntime:true
-                        }                        
+                        defCompilerOpts.promises = true ;
+                        defCompilerOpts.wrapAwait = true ;
+                        defCompilerOpts.noRuntime = true ;
                     }
 
                     if (defCompilerOpts && typeof defCompilerOpts==="object") {
@@ -72,8 +75,6 @@ module.exports = function (babel) {
                             compilerOpts[k] = defCompilerOpts[k] ;
                         }) ;
                     }
-                    compilerOpts.babelTree = true;
-                    compilerOpts.parser.noNodentExtensions = true ;
 
                     var pr = { origCode: state.file.code, filename: '', ast: path.node };
                     compiler.asynchronize(pr, undefined, compilerOpts, compiler.log);
@@ -81,9 +82,9 @@ module.exports = function (babel) {
                     var runtime ;
                     if (!compilerOpts.noRuntime) {
                         if (compilerOpts.generators) {
-                            runtime = getRuntime('Function.prototype.$asyncspawn', Function.prototype.$asyncspawn, compilerOpts, compiler);
+                            runtime = getRuntime('Function.prototype.$asyncspawn', require('nodent-runtime').$asyncspawn, compilerOpts, compiler);
                         } else {
-                            runtime = getRuntime('Function.prototype.$asyncbind', Function.prototype.$asyncbind, compilerOpts, compiler);
+                            runtime = getRuntime('Function.prototype.$asyncbind', require('nodent-runtime').$asyncbind, compilerOpts, compiler);
                         }
 
                         if (state.opts.useRuntimeModule) {
@@ -119,12 +120,12 @@ module.exports = function (babel) {
             },
 
             AwaitExpression: function Function(path, state) {
-                shouldIncludeRuntime = true;
+                requiresTranspilation = true;
             },
 
             Function: function Function(path, state) {
                 if (path.node.async) {
-                    shouldIncludeRuntime = true;
+                    requiresTranspilation = true;
                 }
             }
         }
