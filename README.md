@@ -23,7 +23,7 @@ Install
 ```bash
 npm install fast-async --save
 ```
-  
+
 Usage
 -----
 
@@ -98,10 +98,10 @@ The dontMapStackTraces now defaults to `true` as having both nodent and babel ma
 
 runtimePattern
 --------------
-By default, fast-async will put the nodent runtime into every file containing an `async` function or `await` expression. 
-If your project is made up of more than one file, the constant redefinition of the runtime is a waste of time and space. You can 
-specify that you want the runtime in particular file(s) by setting the 'runtimePattern' to a regular expression (in quotes). 
-Only files that match the regular expression will have the runtime defined (which is global, so you only need it once). 
+By default, fast-async will put the nodent runtime into every file containing an `async` function or `await` expression.
+If your project is made up of more than one file, the constant redefinition of the runtime is a waste of time and space. You can
+specify that you want the runtime in particular file(s) by setting the 'runtimePattern' to a regular expression (in quotes).
+Only files that match the regular expression will have the runtime defined (which is global, so you only need it once).
 
 Note: At least one of the file(s) matching the "runtimePattern" must use either `await` or `async` as the runtime function (or `require('nodent-runtime')` if you set `"useRuntimeModule":true`) is only included for files that reference it.
 
@@ -121,6 +121,25 @@ Alternatively, if you set runtimePattern to `"directive"`, the statement `"use r
 
 > v6.1.x
 If you specify the option `"useRuntimeModule":true`, the runtime is not included directly as source, but via an import of [nodent-runtime](https://github.com/MatAtBread/nodent-runtime), which is typically resolved to `require()` by babel. The nodent-runtime module must be added as a dependency in your target project. The runtime need only be included once in your entire project, and should precede any code that uses async or await.
+
+Promises polyfill
+--------------
+The purpose of `fast-async` is to transform the `async` and `await` into code which can be run in environments that don't support these keywords. With `promises: false` option, the transformed code will not reference the `Promise` global object for its internal logic, however if you use `Promise` in your code, it will be left as is. Therefore, you still need to install a _polyfill_ if you want to use this plugin to transpile code for environments without the `Promise` support.
+
+For example, with `Webpack`, you can do it by using `webpack.ProvidePlugin`:
+
+```js
+// npm install zousan
+
+const config = {
+  // ...
+  plugins: {
+    new webpack.ProvidePlugin({
+      Promise: 'zousan',
+    }),
+  },
+}
+```
 
 Useful Links
 ------------
