@@ -1,7 +1,7 @@
 fast-async
 ==========
 
-'fast-async' is a _Babel v6.x.x_ plugin that implements the ES7 keywords `async` and `await` using syntax transformation
+'fast-async' is a _Babel v6 and v7_ plugin that implements the ES7 keywords `async` and `await` using syntax transformation
 at compile-time, rather than generators.
 
 The main reason for using 'fast-async' as opposed to Babel's default implementation of async/await is
