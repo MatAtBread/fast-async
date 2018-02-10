@@ -34,6 +34,14 @@ Just include the plugin to the babel options. Minimal `.babelrc` example:
 }
 ```
 
+**N.B.:** Starting in Babel v7, you'll need to prefix plugin names that do not begin with the `babel-plugin-` prefix with a `module:` directive:
+
+```js
+{
+  "plugins": ["module:fast-async"]
+}
+```
+
 That's all. Neither `babel-plugin-transform-runtime` nor `babel-polyfill` required. Your application, once compiled, will probably needs nodent's runtime = see [below](#runtimepattern).
 
 With options:
