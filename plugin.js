@@ -7,13 +7,14 @@
 module.exports = function (babel) {
     var logger = console.log.bind(console);
     var NodentCompiler = require('nodent-compiler');
+    var addSideEffect = require('@babel/helper-module-imports').addSideEffect;
     var compiler = null;
     var compilerOpts = {};
     var requiresTranspilation = false;
     var defaultEnv = {
         log:logger
     };
-    
+
     function getRuntime(symbol, fn, opts, compiler) {
         var runtime = symbol + '=' + fn.toString().replace(/[\s]+/g, ' ') + ';\n';
         opts.parser.ranges = false;
@@ -44,16 +45,16 @@ module.exports = function (babel) {
                     // Check if there was an async or await keyword before bothering to process the AST
                     if (!requiresTranspilation)
                         return ;
-                    
+
                     state.opts = state.opts || {} ;
                     var envOpts = state.opts.env || {};
                     Object.keys(defaultEnv).forEach(function(k){
                         if (!(k in envOpts))
                             envOpts[k] = defaultEnv[k] ;
                     }) ;
-                    
+
                     compiler = new NodentCompiler(envOpts);
-                    
+
                     /* Compiler options */
                     compilerOpts = {} ;
                     Object.keys(NodentCompiler.initialCodeGenOpts).forEach(function(k){
@@ -88,7 +89,8 @@ module.exports = function (babel) {
                         }
 
                         if (state.opts.useRuntimeModule) {
-                            state.addImport(state.opts.useRuntimeModule === true ? 'nodent-runtime' : state.opts.useRuntimeModule, 'default');
+                            var moduleName = state.opts.useRuntimeModule === true ? 'nodent-runtime' : state.opts.useRuntimeModule
+                            addSideEffect(path, moduleName)
                         }
                         else if (!state.opts.runtimePattern) {
                             path.unshiftContainer('body', runtime);
@@ -108,7 +110,7 @@ module.exports = function (babel) {
                         else {
                             var pattern = new RegExp(state.opts.runtimePattern);
                             var parserOpts = state.file.parserOpts;
-                            
+
                             // The key is called sourceFileName since babel-core 6.16:
                             var sourceFileName = parserOpts.filename || parserOpts.sourceFileName;
                             if (sourceFileName.match(pattern)) {

@@ -1,7 +1,7 @@
 fast-async
 ==========
 
-'fast-async' is a _Babel v6.x.x_ plugin that implements the ES7 keywords `async` and `await` using syntax transformation
+'fast-async' is a _Babel v6 and v7_ plugin that implements the ES7 keywords `async` and `await` using syntax transformation
 at compile-time, rather than generators.
 
 The main reason for using 'fast-async' as opposed to Babel's default implementation of async/await is
@@ -31,6 +31,14 @@ Just include the plugin to the babel options. Minimal `.babelrc` example:
 ```js
 {
   "plugins": ["fast-async"]
+}
+```
+
+**N.B.:** Starting in Babel v7, you'll need to prefix plugin names that do not begin with the `babel-plugin-` prefix with a `module:` directive:
+
+```js
+{
+  "plugins": ["module:fast-async"]
 }
 ```
 
