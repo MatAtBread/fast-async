@@ -20,7 +20,7 @@ module.exports = function (babel) {
         opts.parser.ranges = false;
         opts.parser.locations = false;
         // Use babel rather than nodent (acorn) as babel's AST is not ESTree compliant
-        var ast = babel.transform(runtime).ast.program.body[0];
+        var ast = babel.transform(runtime, { ast: true }).ast.program.body[0];
         // Remove location information from the runtime as Babel >=6.5.0 does a search by
         // location and barfs if multiple nodes apparently occupy the same source locations
         ast = JSON.parse(JSON.stringify(ast, function replacer(key, value) {
