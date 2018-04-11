@@ -7,7 +7,6 @@
 module.exports = function (babel) {
     var logger = console.log.bind(console);
     var NodentCompiler = require('nodent-compiler');
-    var addSideEffect = require('@babel/helper-module-imports').addSideEffect;
     var compiler = null;
     var compilerOpts = {};
     var requiresTranspilation = false;
@@ -89,8 +88,7 @@ module.exports = function (babel) {
                         }
 
                         if (state.opts.useRuntimeModule) {
-                            var moduleName = state.opts.useRuntimeModule === true ? 'nodent-runtime' : state.opts.useRuntimeModule
-                            addSideEffect(path, moduleName)
+                        	   state.addImport(state.opts.useRuntimeModule === true ? 'nodent-runtime' : state.opts.useRuntimeModule, 'default');
                         }
                         else if (!state.opts.runtimePattern) {
                             path.unshiftContainer('body', runtime);

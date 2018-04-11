@@ -1,8 +1,12 @@
 fast-async
 ==========
 
-'fast-async' is a _Babel v6 and v7_ plugin that implements the ES7 keywords `async` and `await` using syntax transformation
+'fast-async' is a _Babel_ plugin that implements the ES7 keywords `async` and `await` using syntax transformation
 at compile-time, rather than generators.
+
+For _Babel v6.x.x_ install **fast-async@6**
+For _Babel v7.x.x_ install **fast-async@7**
+NB: Babel 7 is in beta. The core nodent functionality is due to be included in Babel 7 release - see https://github.com/babel/babel/pull/7076
 
 The main reason for using 'fast-async' as opposed to Babel's default implementation of async/await is
 performance (https://github.com/MatAtBread/nodent#performance) - it's 3-4 times faster in a browser/node, and
