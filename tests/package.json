@@ -1,17 +1,16 @@
 {
   "name": "fast-async-test",
-  "version": "6.3.0",
+  "version": "7.0.2",
   "dependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-core": "^6.25.0",
-    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "@babel/cli": "^7.0.0-beta.44",
+    "@babel/core": "^7.0.0-beta.44",
     "colors": "^1.1.2",
-    "nodent": "^3.1.0"
+    "nodent": "^3.2.0"
   },
   "description": "fast-async/await transformer Babel plugin - test module",
   "main": "test.js",
   "scripts": {
-    "test": "node_modules/babel-cli/bin/babel.js test-input.js && node --expose-gc ."
+    "test": "node_modules/@babel/cli/bin/babel.js test-input.js && node --expose-gc ."
   },
   "author": "Mat At Bread <nodent@mailed.me.uk>",
   "license": "BSD-2-Clause",
@@ -21,7 +20,7 @@
   "babel": {
     "plugins": [
       [
-        "..",
+        "module:..",
         {
           "spec": true
         }

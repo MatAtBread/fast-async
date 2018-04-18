@@ -9,9 +9,9 @@ require('colors');
 var fs = require('fs') ;
 
 try {
-    var babel = require("babel-core") ;
+    var babel = require("@babel/core") ;
 } catch (ex) {
-    console.log("#### To run the tests you need to "+"npm install babel-core".yellow+" (run 'npm i' in this directory). This additional module is only required for testing, not deployment.") ;
+    console.log("#### To run the tests you need to "+"npm install @babel/core".yellow+" (run 'npm i' in this directory). This additional module is only required for testing, not deployment.") ;
     process.exit(-1) ;
 }
 
