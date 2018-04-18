@@ -1,8 +1,8 @@
 {
   "name": "fast-async",
-  "version": "6.3.4",
+  "version": "6.3.5",
   "dependencies": {
-    "nodent-compiler": ">=3.1.8",
+    "nodent-compiler": "^3.2.0",
     "nodent-runtime": ">=3.2.1"
   },
   "description": "fast-async/await transformer Babel plugin",
