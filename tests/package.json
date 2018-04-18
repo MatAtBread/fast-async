@@ -22,7 +22,9 @@
       [
         "module:..",
         {
-          "spec": true
+          "runtime": false,
+          "codeGenerationOptions": {
+          }
         }
       ]
     ]
