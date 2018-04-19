@@ -22,9 +22,8 @@
       [
         "module:..",
         {
-          "runtime": false,
-          "codeGenerationOptions": {
-          }
+          "runtime": true,
+          "codeGenerationOptions": {}
         }
       ]
     ]

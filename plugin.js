@@ -19,7 +19,7 @@ const transform = require("nodent-transform").transform;
 
 function transformAsyncToPromises(api, options) {
   let requiresTranspilation;
-  const runtime = options.runtime ? options.runtime : null;
+  const runtime = options.runtime ? (typeof options.runtime==="string" ? options.runtime : "$nodent_runtime") : null;
   const opts = {
     // Code generation options
     es6target: false,
