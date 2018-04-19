@@ -1,7 +1,7 @@
 /* Babel 7 transform */
 
-const babylon = require("babylon");
-const generate = require("@babel/generator").default;
+var babylon = require("babylon");
+var generate = require("@babel/generator").default;
 
 function printNode(ast) {
   return generate(ast, {}).code;
@@ -15,12 +15,12 @@ function parse(code) {
   }).program;
 }
 
-const transform = require("nodent-transform").transform;
+var transform = require("nodent-transform").transform;
 
 function transformAsyncToPromises(api, options) {
-  let requiresTranspilation;
-  const runtime = options.runtime ? (typeof options.runtime==="string" ? options.runtime : "$nodent_runtime") : null;
-  const opts = {
+  var requiresTranspilation;
+  var runtime = options.runtime ? (typeof options.runtime==="string" ? options.runtime : "$nodent_runtime") : null;
+  var opts = {
     // Code generation options
     es6target: false,
     babelTree: true,
@@ -42,8 +42,8 @@ function transformAsyncToPromises(api, options) {
   };
 
   if (options.codeGenerationOptions) {
-    const keys = Object.keys(options.codeGenerationOptions);
-    for (let i = 0; i < keys.length; i++) {
+    var keys = Object.keys(options.codeGenerationOptions);
+    for (var i = 0; i < keys.length; i++) {
       if (keys[i] in opts) {
         opts[keys[i]] = options.codeGenerationOptions[keys[i]];
       }
@@ -60,7 +60,7 @@ function transformAsyncToPromises(api, options) {
           // Check if there was an async or await keyword before bothering to process the AST
           if (!requiresTranspilation) return;
 
-          const newAst = transform(
+          var newAst = transform(
             {
               // Input: the ast and filename
               filename: state.filename,
@@ -72,7 +72,7 @@ function transformAsyncToPromises(api, options) {
               parse: parse, // Parse a JS fragment into an AST
               printNode: printNode, // Print a node as JS source
               logger: false /* console.log.bind(console)*/, // Log a warning
-            },
+            }
           ).ast;
 
           if (runtime) {
