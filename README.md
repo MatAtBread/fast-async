@@ -129,7 +129,7 @@ For example:
   ]
 }
 ```
-Alternatively, if you set runtimePattern to `"directive"`, the statement `"use runtime-nodent";` will be replaced with the runtime during compilation.
+Alternatively, if you set runtimePattern to `"directive"`, the statement `"use runtime-nodent";` will be replaced with the runtime during compilation. Please note, that statement should be at very top of your module, as it should be parsed as directive, not as statement.
 
 > v6.1.x
 If you specify the option `"useRuntimeModule":true`, the runtime is not included directly as source, but via an import of [nodent-runtime](https://github.com/MatAtBread/nodent-runtime), which is typically resolved to `require()` by babel. The nodent-runtime module must be added as a dependency in your target project. The runtime need only be included once in your entire project, and should precede any code that uses async or await.
